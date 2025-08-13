@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Identificador de Geoglifos</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        padding: 20px;
+    }
+    video, canvas {
+        width: 100%;
+        max-width: 400px;
+        border: 1px solid #ccc;
+        margin-top: 10px;
+    }
+</style>
+</head>
+<body>
+<h2>App Identificador de Geoglifos</h2>
+<div id="login">
+    <p>Digite a senha para acessar:</p>
+    <input type="password" id="senha">
+    <button onclick="checkSenha()">Entrar</button>
+    <p id="msg" style="color:red;"></p>
+</div>
+<div id="app" style="display:none;">
+    <video id="camera" autoplay></video>
+    <button onclick="capturar()">Capturar Foto</button>
+    <canvas id="canvas"></canvas>
+    <p id="resultado"></p>
+</div>
+
+<script>
+const senhaCorreta = "meuapp2025";
+
+function checkSenha() {
+    const senha = document.getElementById('senha').value;
+    if (senha === senhaCorreta) {
+        document.getElementById('login').style.display = 'none';
+        document.getElementById('app').style.display = 'block';
+        iniciarCamera();
+    } else {
+        document.getElementById('msg').innerText = "Senha incorreta!";
+    }
+}
+
+function iniciarCamera() {
+    const video = document.getElementById('camera');
+    navigator.mediaDevices.getUserMedia({ video: true })
+        .then(stream => {
+            video.srcObject = stream;
+        })
+        .catch(err => {
+            alert("Erro ao acessar câmera: " + err);
+        });
+}
+
+function capturar() {
+    const video = document.getElementById('camera');
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    ctx.drawImage(video, 0, 0);
+    document.getElementById('resultado').innerText = "Imagem capturada! (Análise de geoglifos virá aqui)";
+}
+</script>
+</body>
+</html>

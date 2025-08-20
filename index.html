@@ -1,42 +1,71 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Geoglifos App</title>
-    <style>
-        body {
-            margin: 0;
-            background-color: #000;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-        video {
-            width: 100%;
-            height: auto;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Geoglifos App</title>
+  <style>
+    body {
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background: #111;
+      color: #fff;
+    }
+    video {
+      width: 90%;
+      max-width: 500px;
+      border: 2px solid #00ff88;
+      border-radius: 12px;
+    }
+    button {
+      margin-top: 15px;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      background: #00ff88;
+      color: #111;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #00cc66;
+    }
+  </style>
 </head>
 <body>
+  <h2>📷 Geoglifos App</h2>
+  <video id="camera" autoplay playsinline></video>
+  <button id="toggle">Trocar Câmera</button>
 
-<video id="camera" autoplay playsinline></video>
+  <script>
+    const video = document.getElementById("camera");
+    const toggleBtn = document.getElementById("toggle");
+    let usingFront = false;
 
-<script>
-    const video = document.getElementById('camera');
-
-    navigator.mediaDevices.getUserMedia({
-        video: { facingMode: { exact: "environment" } }
-    })
-    .then(stream => {
+    async function startCamera() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: usingFront ? "user" : "environment" }
+        });
         video.srcObject = stream;
-    })
-    .catch(err => {
-        console.error("Erro ao acessar câmera traseira: ", err);
-        alert("Não foi possível acessar a câmera traseira. Verifique as permissões.");
-    });
-</script>
+      } catch (err) {
+        alert("Erro ao acessar a câmera: " + err);
+      }
+    }
 
+    toggleBtn.addEventListener("click", () => {
+      usingFront = !usingFront;
+      startCamera();
+    });
+
+    startCamera();
+  </script>
 </body>
 </html>
+
+

@@ -46,12 +46,18 @@
     const video = document.getElementById("camera");
     const toggleBtn = document.getElementById("toggle");
     let usingFront = false;
+    let currentStream;
 
     async function startCamera() {
+      if (currentStream) {
+        // Para todas as tracks da câmera anterior
+        currentStream.getTracks().forEach(track => track.stop());
+      }
       try {
         const stream = await navigator.mediaDevices.getUserMedia({
           video: { facingMode: usingFront ? "user" : "environment" }
         });
+        currentStream = stream;
         video.srcObject = stream;
       } catch (err) {
         alert("Erro ao acessar a câmera: " + err);
@@ -67,5 +73,7 @@
   </script>
 </body>
 </html>
+
+
 
 

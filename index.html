@@ -51,23 +51,32 @@
     let model, webcam, maxPredictions, labelContainer;
 
     async function init() {
-      const modelURL = URL + "model.json";
-      const metadataURL = URL + "metadata.json";
-      model = await tmImage.load(modelURL, metadataURL);
-      maxPredictions = model.getTotalClasses();
+      try {
+        console.log("Carregando modelo...");
+        const modelURL = URL + "model.json";
+        const metadataURL = URL + "metadata.json";
+        model = await tmImage.load(modelURL, metadataURL);
+        maxPredictions = model.getTotalClasses();
+        console.log("Modelo carregado:", maxPredictions, "classes");
 
-      webcam = new tmImage.Webcam(320, 240, true); // largura, altura, flip
-      await webcam.setup();
-      await webcam.play();
+        webcam = new tmImage.Webcam(320, 240, true);
+        await webcam.setup();
+        await webcam.play();
 
-      document.getElementById("camera").appendChild(webcam.canvas);
-      labelContainer = document.getElementById("label-container");
+        document.getElementById("camera").innerHTML = "";
+        document.getElementById("camera").appendChild(webcam.canvas);
 
-      for (let i = 0; i < maxPredictions; i++) {
-        labelContainer.appendChild(document.createElement("div"));
+        labelContainer = document.getElementById("label-container");
+        labelContainer.innerHTML = "";
+        for (let i = 0; i < maxPredictions; i++) {
+          labelContainer.appendChild(document.createElement("div"));
+        }
+
+        window.requestAnimationFrame(loop);
+      } catch (err) {
+        console.error("Erro ao inicializar:", err);
+        alert("Erro ao inicializar IA. Veja o console (F12) para detalhes.");
       }
-
-      window.requestAnimationFrame(loop);
     }
 
     async function loop() {
@@ -91,6 +100,8 @@
   </script>
 </body>
 </html>
+
+
 
 
 

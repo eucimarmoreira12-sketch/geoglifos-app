@@ -20,25 +20,24 @@
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest"></script>
   <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest"></script>
   <script>
-    const URL = "./my_model/";
+    const URL = "https://teachablemachine.withgoogle.com/models/MYJ4D6GI7/";
     let model, webcam, maxPredictions;
 
     async function init() {
-      try {
-        const modelURL = URL + "model.json";
-        const metadataURL = URL + "metadata.json";
-        model = await tmImage.load(modelURL, metadataURL);
-        maxPredictions = model.getTotalClasses();
+      const modelURL = URL + "model.json";
+      const metadataURL = URL + "metadata.json";
+      model = await tmImage.load(modelURL, metadataURL);
+      maxPredictions = model.getTotalClasses();
 
-        webcam = new tmImage.Webcam(320, 240, true);
-        await webcam.setup();
-        await webcam.play();
-        document.getElementById("camera").srcObject = webcam.stream;
-        predict();
-      } catch (error) {
-        alert("Erro ao iniciar IA. Veja o console (F12).");
-        console.error(error);
-      }
+      webcam = new tmImage.Webcam(320, 240, true);
+      await webcam.setup();
+      await webcam.play();
+
+      // Mostra vídeo da webcam
+      document.getElementById("camera").srcObject = webcam.stream;
+
+      // Começa a prever
+      predict();
     }
 
     async function predict() {
@@ -54,19 +53,8 @@
     }
 
     function start() {
-      init();
+      init().catch(err => console.error("Erro ao iniciar IA:", err));
     }
   </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-

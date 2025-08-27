@@ -5,93 +5,52 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Geoglifos IA</title>
   <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #222;
-      color: white;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      height: 100vh;
-    }
-    canvas {
-      width: 80%;
-      max-width: 500px;
-      border: 2px solid #0f0;
-      margin-top: 10px;
-      border-radius: 8px;
-    }
-    #label-container div {
-      margin-top: 8px;
-      font-size: 18px;
-    }
-    button {
-      margin-top: 12px;
-      padding: 10px 20px;
-      border: none;
-      border-radius: 6px;
-      background: #0f0;
-      color: #222;
-      font-size: 16px;
-      cursor: pointer;
-    }
+    body { margin: 0; font-family: Arial, sans-serif; background: #222; color: white; display: flex; flex-direction: column; align-items: center; height: 100vh; }
+    video { width: 80%; max-width: 500px; border: 2px solid #0f0; margin-top: 10px; border-radius: 8px; }
+    #label-container div { margin-top: 8px; font-size: 18px; }
+    button { margin-top: 12px; padding: 10px 20px; border: none; border-radius: 6px; background: #0f0; color: #222; font-size: 16px; cursor: pointer; }
   </style>
 </head>
 <body>
   <h2>Geoglifos com IA</h2>
-  <div id="camera"></div>
+  <video id="camera" autoplay playsinline></video>
   <div id="label-container"></div>
   <button onclick="start()">Iniciar IA</button>
 
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest"></script>
   <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest"></script>
   <script>
-    const URL = "https://teachablemachine.withgoogle.com/models/MYJ4D6GI7/";
-    let model, webcam, maxPredictions, labelContainer;
+    const URL = "./my_model/";
+    let model, webcam, maxPredictions;
 
     async function init() {
       try {
-        console.log("Carregando modelo...");
         const modelURL = URL + "model.json";
         const metadataURL = URL + "metadata.json";
         model = await tmImage.load(modelURL, metadataURL);
         maxPredictions = model.getTotalClasses();
-        console.log("Modelo carregado:", maxPredictions, "classes");
 
         webcam = new tmImage.Webcam(320, 240, true);
         await webcam.setup();
         await webcam.play();
-
-        document.getElementById("camera").innerHTML = "";
-        document.getElementById("camera").appendChild(webcam.canvas);
-
-        labelContainer = document.getElementById("label-container");
-        labelContainer.innerHTML = "";
-        for (let i = 0; i < maxPredictions; i++) {
-          labelContainer.appendChild(document.createElement("div"));
-        }
-
-        window.requestAnimationFrame(loop);
-      } catch (err) {
-        console.error("Erro ao inicializar:", err);
-        alert("Erro ao inicializar IA. Veja o console (F12) para detalhes.");
+        document.getElementById("camera").srcObject = webcam.stream;
+        predict();
+      } catch (error) {
+        alert("Erro ao iniciar IA. Veja o console (F12).");
+        console.error(error);
       }
-    }
-
-    async function loop() {
-      webcam.update();
-      await predict();
-      window.requestAnimationFrame(loop);
     }
 
     async function predict() {
       const prediction = await model.predict(webcam.canvas);
-      for (let i = 0; i < maxPredictions; i++) {
-        const classPrediction =
-          prediction[i].className + ": " + (prediction[i].probability * 100).toFixed(1) + "%";
-        labelContainer.childNodes[i].innerHTML = classPrediction;
-      }
+      const container = document.getElementById("label-container");
+      container.innerHTML = ""; 
+      prediction.forEach(p => {
+        const div = document.createElement("div");
+        div.innerText = `${p.className}: ${(p.probability * 100).toFixed(1)}%`;
+        container.appendChild(div);
+      });
+      window.requestAnimationFrame(predict);
     }
 
     function start() {
@@ -100,6 +59,7 @@
   </script>
 </body>
 </html>
+
 
 
 
